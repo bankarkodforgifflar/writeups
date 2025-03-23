@@ -1,3 +1,5 @@
+> IMPORTANT! All writeups MUST START with a metadata tag. No spaces, newlines or other BS before!
+
 # Giffel writeups
 
 Very serious writeups :neckbeard:
