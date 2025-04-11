@@ -1,0 +1,12 @@
+name: 'Compile Metadata'
+description: 'Compile Writeup Metadata'
+runs:
+  using: "composite"
+  steps:
+    - name: Make executable
+      run: chmod +x writeup.py
+      shell: bash
+
+    - name: Run action
+      run: ./writeup.py
+      shell: bash

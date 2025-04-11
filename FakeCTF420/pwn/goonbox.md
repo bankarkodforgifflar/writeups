@@ -1,7 +1,7 @@
 <!--BKFG
 title="The Goonbox"
 author="Faker"
-date="1420/06/09"
+date="14200609"
 -->
 
 # The Goonbox
