@@ -7,11 +7,14 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Get short commit SHA
+        id: shortsha
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v4
       - uses: ./.github/actions/compile # Compile metadata
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "compiled.sqlite3"
-          tag: ${{ github.event.head_commit.id }}
-          commit: ${{ github.event.head_commit.id }}
+          tag: ${{ steps.shortsha.outputs.SHORT_SHA }}
+          commit: ${{ github.event.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
