@@ -8,5 +8,5 @@ runs:
       shell: bash
 
     - name: Run action
-      run: ./writeup.py
+      run: ./writeup.py compile
       shell: bash

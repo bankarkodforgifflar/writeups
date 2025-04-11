@@ -10,3 +10,5 @@ jobs:
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "compiled.sqlite3"
+          tag: ${{ github.event.head_commit.id }}
+          token: ${{ secrets.GITHUB_TOKEN }}
