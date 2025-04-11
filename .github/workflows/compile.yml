@@ -11,4 +11,5 @@ jobs:
         with:
           artifacts: "compiled.sqlite3"
           tag: ${{ github.event.head_commit.id }}
+          commit: ${{ github.event.head_commit.id }}
           token: ${{ secrets.GITHUB_TOKEN }}
