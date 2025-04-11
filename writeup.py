@@ -8,6 +8,7 @@ import sqlite3
 import datetime
 import tomllib
 import pathlib
+import uuid
 
 directory = "./"
 manifest = {}
@@ -22,11 +23,13 @@ def init_db():
     con = sqlite3.connect("compiled.sqlite3")
     cur = con.cursor()
     cur.execute("""CREATE TABLE competitions(
+    id TEXT NOT NULL,
     name TEXT NOT NULL,
     categories TEXT NOT NULL,
     date INTEGER NOT NULL
 );""")
     cur.execute("""CREATE TABLE metadata(
+    id TEXT NOT NULL,
     title TEXT NOT NULL,
     author TEXT,
     date INTEGER,
@@ -45,29 +48,33 @@ def compile_data():
     for comp in manifest["competitions"]:
         try:
             cmanifest = load_comp_manifest(comp)
+            comp_uuid = str(uuid.uuid4())
             # Insert competition
-            cur.execute("INSERT INTO competitions(name,categories,date) VALUES(?,?,?)",
-                    (cmanifest["name"], json.dumps(cmanifest["categories"]), int(datetime.datetime.strptime(cmanifest["yearmonth"], "%Y%m").timestamp())))
-            data = collect_writeups(comp, cmanifest["name"])
+            cur.execute("INSERT INTO competitions(id,name,categories,date) VALUES(?,?,?,?)",
+                        (comp_uuid, cmanifest["name"], json.dumps(cmanifest["categories"]), int(datetime.datetime.strptime(cmanifest["yearmonth"], "%Y%m").timestamp())))
+            data = collect_writeups(comp, comp_uuid)
             for d in data:
-                cur.execute("INSERT INTO metadata(title,author,date,content,competition,category) VALUES(?,?,?,?,?,?)", d)
+                cur.execute(
+                    "INSERT INTO metadata(id,title,author,date,content,competition,category) VALUES(?,?,?,?,?,?,?)", d)
         except Exception as e:
             print(f"[WARNING] Skipping {comp} - Encountered error:")
             print(e)
-        
+
     con.commit()
 
-def collect_writeups(comp: str, name: str):
+
+def collect_writeups(comp: str, id: str):
     metadata = []
     sql_friendly_data = []
     comp = pathlib.Path(comp).glob('**/*.md')
     for w in comp:
-        content = open(w,"r").read()
-        start=content.find("<!--BKFG")
-        if start == -1: # Doesn't contain metadata tag, skip
+        content = open(w, "r").read()
+        start = content.find("<!--BKFG")
+        if start == -1:  # Doesn't contain metadata tag, skip
             continue
-        elif content.find("-->") == -1: # closing tag wasn't found
-            print(f"[{w}] [WARNING] Start of metadata tag found but no closing tag found!")
+        elif content.find("-->") == -1:  # closing tag wasn't found
+            print(
+                f"[{w}] [WARNING] Start of metadata tag found but no closing tag found!")
             continue
         tag = content[start+8:content.find("-->")]
         parsed = tomllib.loads(tag)
@@ -82,8 +89,11 @@ def collect_writeups(comp: str, name: str):
         date = m.get("date")
         if not date == None:
             date = int(datetime.datetime.strptime(date, "%Y%m%d").timestamp())
-        sql_friendly_data.append((m["title"], m.get("author"), date, m["content"], name, m["category"]))
+        m_uuid = str(uuid.uuid4())
+        sql_friendly_data.append((m_uuid, m["title"], m.get(
+            "author"), date, m["content"], id, m["category"]))
     return sql_friendly_data
+
 
 def load_comp_manifest(comp: str):
     m = open(os.path.join(comp, "manifest.json"), "r").read()
