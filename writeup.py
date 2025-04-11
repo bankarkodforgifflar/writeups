@@ -136,7 +136,7 @@ def create_ctf(name, categories, yearmonth, dirname=None):
     ctf_manifest = {
         "name": name,
         "categories": categories,
-        "yearmonth": date
+        "yearmonth": yearmonth
     }
 
     # create manifest and folders
