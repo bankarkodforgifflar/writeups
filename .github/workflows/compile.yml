@@ -1,9 +1,11 @@
 on: [push]
 
 jobs:
-  hello_world_job:
+  compile_metadata:
     runs-on: ubuntu-latest
     name: Compiles all writeups to a database
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/compile # Compile metadata
