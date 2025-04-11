@@ -8,13 +8,15 @@ import sqlite3
 import datetime
 import tomllib
 import pathlib
-import uuid
+from hashlib import sha1
 
 directory = "./"
 manifest = {}
 con = None
 cur = None
 
+def gen_id(inp: str):
+    return sha1(bytes(inp, "utf-8")).digest().hex()[:8]
 
 def init_db():
     global con, cur
@@ -48,7 +50,7 @@ def compile_data():
     for comp in manifest["competitions"]:
         try:
             cmanifest = load_comp_manifest(comp)
-            comp_uuid = str(uuid.uuid4())
+            comp_uuid = gen_id(cmanifest["name"])
             # Insert competition
             cur.execute("INSERT INTO competitions(id,name,categories,date) VALUES(?,?,?,?)",
                         (comp_uuid, cmanifest["name"], json.dumps(cmanifest["categories"]), int(datetime.datetime.strptime(cmanifest["yearmonth"], "%Y%m").timestamp())))
@@ -89,7 +91,7 @@ def collect_writeups(comp: str, id: str):
         date = m.get("date")
         if not date == None:
             date = int(datetime.datetime.strptime(date, "%Y%m%d").timestamp())
-        m_uuid = str(uuid.uuid4())
+        m_uuid = gen_id(m["title"])
         sql_friendly_data.append((m_uuid, m["title"], m.get(
             "author"), date, m["content"], id, m["category"]))
     return sql_friendly_data
