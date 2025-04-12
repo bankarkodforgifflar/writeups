@@ -18,3 +18,4 @@ jobs:
           tag: ${{ steps.shortsha.outputs.SHORT_SHA }}
           commit: ${{ github.event.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
+          makeLatest: true
