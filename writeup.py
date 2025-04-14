@@ -35,7 +35,7 @@ def init_db():
     title TEXT NOT NULL,
     author TEXT,
     date INTEGER,
-    content BLOB NOT NULL,
+    content TEXT NOT NULL,
     competition TEXT NOT NULL,
     category TEXT NOT NULL,
     FOREIGN KEY (competition)
